@@ -1,113 +1,223 @@
-import Image from 'next/image'
+"use client";
 
-export default function Home() {
+import { CommonInput } from "./component/CommonInput";
+import { ControlNetInput } from "./component/ControlNetInput";
+import { ExtraInput } from "./component/ExtraInput";
+import { Img2imgImageInput } from "./component/Img2imgImageInput";
+import { PromptContainer } from "./component/PromptContainer";
+import { useExtra } from "./hook/useExtra.hook";
+import { useImg2img } from "./hook/useImg2img.hook";
+import { useOptions } from "./hook/useOptions.hook";
+import { useProgress } from "./hook/useProgress.hook";
+import { useTxt2img } from "./hook/useTxt2img.hook";
+import { useEffect, useState } from "react";
+
+const sdModel = [
+  {
+    title: "Realistic_Vision_V2.0-inpainting.ckpt [73c461d2cf]",
+    model_name: "Realistic_Vision_V2.0-inpainting",
+    hash: "73c461d2cf",
+    sha256: "73c461d2cf60c7f93280c34ef8649522ecd99f920f738c5d795cb1a142116b1d",
+    filename: "Realistic_Vision_V2.0-inpainting.ckpt",
+    config: null,
+  },
+  {
+    title: "v1-5-pruned.ckpt [e1441589a6]",
+    model_name: "v1-5-pruned",
+    hash: "e1441589a6",
+    sha256: "e1441589a6f3c5a53f5f54d0975a18a7feb7cdf0b0dee276dfc3331ae376a053",
+    filename: "v1-5-pruned.ckpt",
+    config: null,
+  },
+  {
+    title: "Realistic_Vision_V2.0.ckpt [81086e2b3f]",
+    model_name: "Realistic_Vision_V2.0",
+    hash: "81086e2b3f",
+    sha256: "81086e2b3f3741a82a39bf00f3e98dbbbc31876679d312bd81a46b26d8c5d3d2",
+    filename: "Realistic_Vision_V2.0.ckpt",
+    config: null,
+  },
+];
+
+export default function Page() {
+  const [images, setImages] = useState<any[]>([]);
+  const [result, setResult] = useState<any>(null);
+  const [loadingImages, setLoadingImages] = useState<string>("");
+  const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
+  const [model, setModel] = useState<string>(
+    "Realistic_Vision_V2.0-inpainting"
+  );
+
+  const {
+    images: generatedImages,
+    loading,
+    error,
+    txt2img,
+  } = useTxt2img({
+    url: "http://127.0.0.1:7860",
+    port: "",
+  });
+
+  const {
+    images: generatedImages2,
+    result: result2,
+    loading: loading2,
+    error: error2,
+    img2img,
+  } = useImg2img({
+    url: "http://127.0.0.1:7860",
+    port: "",
+  });
+
+  const {
+    images: generatedImages3,
+    result: result3,
+    loading: loading3,
+    error: error3,
+    extra,
+  } = useExtra({
+    url: "http://127.0.0.1:7860",
+    port: "",
+  });
+
+  const { query, result: result4 } = useProgress({
+    url: "http://127.0.0.1:7860",
+    port: "",
+  });
+
+  const {
+    result: result5,
+    loading: loading5,
+    setOptions,
+  } = useOptions({
+    url: "http://127.0.0.1:7860",
+    port: "",
+  });
+
+  const handleTxt2imgClick = () => {
+    txt2img();
+    const id = setInterval(() => {
+      query();
+    }, 1000);
+    setIntervalId(id);
+  };
+
+  const handleImg2imgClick = () => {
+    img2img();
+    query();
+  };
+
+  useEffect(() => {
+    if (generatedImages.length > 0) {
+      setImages(generatedImages);
+      clearInterval(intervalId!);
+    }
+  }, [generatedImages]);
+
+  useEffect(() => {
+    if (generatedImages2.length > 0) {
+      setImages(generatedImages2);
+    }
+  }, [generatedImages2]);
+
+  useEffect(() => {
+    if (result4) {
+      setResult(result4);
+    }
+  }, [result4]);
+
+  useEffect(() => {
+    if (result && result.current_image) {
+      setLoadingImages(result.current_image);
+    }
+  }, [result]);
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
+    <>
+      <div>
+        <h1>Model</h1>
+        <select
+          onChange={(e) => {
+            setModel(e.target.value);
+          }}
+        >
+          {sdModel.map((model, index) => (
+            <option key={index} value={model.title}>
+              {model.title}
+            </option>
+          ))}
+        </select>
+        <button
+          onClick={() => {
+            setOptions({
+              sd_model_checkpoint: model,
+            });
+          }}
+          disabled={loading5}
+        >
+          Save
+        </button>
+        {loading5 && <div>loading...</div>}
+
+        <h1>txt2img generation</h1>
+        <PromptContainer mode={0} />
+        <CommonInput mode={0} />
+        <ControlNetInput mode={0} />
+        <button onClick={handleTxt2imgClick}>txt2img</button>
+        {loading && (
+          <>
+            <div>loading...</div>
+            {loadingImages && (
+              <img src={`data:image/png;base64,${loadingImages}`} width="256" />
+            )}
+          </>
+        )}
+
+        {error && <div>{error}</div>}
+        {generatedImages.length > 0 &&
+          generatedImages.map((image, index) => (
+            <img
+              key={index}
+              src={`data:image/png;base64,${image}`}
+              width="256"
+              alt={`image-${index}`}
             />
-          </a>
-        </div>
+          ))}
       </div>
-
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
+      <div>
+        <h1> img2img generation </h1>
+        <PromptContainer mode={1} />
+        <Img2imgImageInput />
+        <ControlNetInput mode={1} />
+        <button onClick={handleImg2imgClick}>img2img</button>
+        {loading2 && <div>loading...</div>}
+        {error2 && <div>{error}</div>}
+        {generatedImages2.length > 0 &&
+          generatedImages2.map((image, index) => (
+            <img
+              key={index}
+              src={`data:image/png;base64,${image}`}
+              width="256"
+              alt={`image-${index}`}
+            />
+          ))}
       </div>
-
-      <div className="mb-32 grid text-center lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800 hover:dark:bg-opacity-30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore the Next.js 13 playground.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
+      <div>
+        <h1> extra generation </h1>
+        <ExtraInput />
+        <button onClick={extra}>extra</button>
+        {loading3 && <div>loading...</div>}
+        {error3 && <div>{error}</div>}
+        {generatedImages3.length > 0 &&
+          generatedImages3.map((image, index) => (
+            <img
+              key={index}
+              src={`data:image/png;base64,${image}`}
+              width="256"
+              alt={`image-${index}`}
+            />
+          ))}
       </div>
-    </main>
-  )
+    </>
+  );
 }

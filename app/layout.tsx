@@ -1,5 +1,5 @@
 import { Providers } from "./redux/provider";
-// import "./globals.css";
+//import "./globals.css";
 import { Inter } from "next/font/google";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -16,6 +16,16 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta
+          name="description"
+          content="Web site created using create-react-app"
+        />
+        <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+
+        <title>React App</title>
+      </head>
       <body className={inter.className}>
         <Providers>{children}</Providers>
       </body>

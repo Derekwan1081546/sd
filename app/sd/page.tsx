@@ -18,8 +18,7 @@ const sdModel = [
     model_name: "Realistic_Vision_V2.0-inpainting",
     hash: "73c461d2cf",
     sha256: "73c461d2cf60c7f93280c34ef8649522ecd99f920f738c5d795cb1a142116b1d",
-    filename:
-      "/home/ubuntu/ai/stable-diffusion-webui/models/Stable-diffusion/Realistic_Vision_V2.0-inpainting.ckpt",
+    filename: "Realistic_Vision_V2.0-inpainting.ckpt",
     config: null,
   },
   {
@@ -27,8 +26,7 @@ const sdModel = [
     model_name: "v1-5-pruned",
     hash: "e1441589a6",
     sha256: "e1441589a6f3c5a53f5f54d0975a18a7feb7cdf0b0dee276dfc3331ae376a053",
-    filename:
-      "/home/ubuntu/ai/stable-diffusion-webui/models/Stable-diffusion/v1-5-pruned.ckpt",
+    filename: "v1-5-pruned.ckpt",
     config: null,
   },
   {
@@ -36,8 +34,7 @@ const sdModel = [
     model_name: "Realistic_Vision_V2.0",
     hash: "81086e2b3f",
     sha256: "81086e2b3f3741a82a39bf00f3e98dbbbc31876679d312bd81a46b26d8c5d3d2",
-    filename:
-      "/home/ubuntu/ai/stable-diffusion-webui/models/Stable-diffusion/Realistic_Vision_V2.0.ckpt",
+    filename: "Realistic_Vision_V2.0.ckpt",
     config: null,
   },
 ];
@@ -57,7 +54,7 @@ export default function Page() {
     error,
     txt2img,
   } = useTxt2img({
-    url: "http://0.0.0.0:7861",
+    url: "http://127.0.0.1:7860",
     port: "",
   });
 
@@ -68,7 +65,7 @@ export default function Page() {
     error: error2,
     img2img,
   } = useImg2img({
-    url: "http://0.0.0.0:7861",
+    url: "http://127.0.0.1:7860",
     port: "",
   });
 
@@ -79,12 +76,12 @@ export default function Page() {
     error: error3,
     extra,
   } = useExtra({
-    url: "http://0.0.0.0:7861",
+    url: "http://127.0.0.1:7860",
     port: "",
   });
 
   const { query, result: result4 } = useProgress({
-    url: "http://0.0.0.0:7861",
+    url: "http://127.0.0.1:7860",
     port: "",
   });
 
@@ -93,7 +90,7 @@ export default function Page() {
     loading: loading5,
     setOptions,
   } = useOptions({
-    url: "http://0.0.0.0:7861",
+    url: "http://127.0.0.1:7860",
     port: "",
   });
 

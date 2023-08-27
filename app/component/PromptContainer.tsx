@@ -59,12 +59,10 @@ export const PromptContainer = (props: PromptContainerProps) => {
         <label htmlFor="prompt">Prompt</label>
         <textarea value={prompt} onChange={handleChange} />
       </div>
-      {display && (
-        <div>
-          <label htmlFor="negative_prompt">Negative Prompt</label>
-          <textarea value={negative_prompt} onChange={handleNegativeChange} />
-        </div>
-      )}
+      <div>
+        <label htmlFor="negative_prompt">Negative Prompt</label>
+        <textarea value={negative_prompt} onChange={handleNegativeChange} />
+      </div>
     </div>
   );
 };
